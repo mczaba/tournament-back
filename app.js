@@ -28,8 +28,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/users", userRouter);
-app.use("/tournament", tournamentRouter);
+app.use("/API/users", userRouter);
+app.use("/API/tournament", tournamentRouter);
 
 app.use((error, req, res, next) => {
   console.log(`from error middleware : ${error}`);

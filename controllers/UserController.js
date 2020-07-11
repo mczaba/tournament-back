@@ -30,6 +30,8 @@ exports.post_SignUp = [
   validator.sanitizeBody("email").escape(),
   validator.sanitizeBody("password").escape(),
   (req, res, next) => {
+    console.log("signup");
+    console.log(req.body);
     const errors = validator.validationResult(req);
     if (!errors.isEmpty()) {
       const error = new Error(errors.errors[0].msg);
@@ -38,7 +40,7 @@ exports.post_SignUp = [
     } else {
       const username_low = req.body.username.toLowerCase();
       User.findOne({ username_lower: username_low })
-        .then((foundUser) => {
+        .then(foundUser => {
           if (foundUser) {
             const error = new Error("This username is already taken");
             error.statusCode = 220;
@@ -46,7 +48,7 @@ exports.post_SignUp = [
           }
           return User.findOne({ email: req.body.email });
         })
-        .then((foundUser) => {
+        .then(foundUser => {
           if (foundUser) {
             console.log("same email");
             const error = new Error("This email is already used");
@@ -64,10 +66,10 @@ exports.post_SignUp = [
             return user.save();
           });
         })
-        .then((user) => {
-          res.send("success");
+        .then(() => {
+          res.send("Success");
         })
-        .catch((error) => {
+        .catch(error => {
           next(error);
         });
     }
@@ -75,10 +77,12 @@ exports.post_SignUp = [
 ];
 
 exports.post_LogIn = (req, res, next) => {
+  console.log("login");
+  console.log(req.body);
   let user = null;
   const username_low = req.body.username.toLowerCase();
   User.findOne({ username_lower: username_low })
-    .then((foundUser) => {
+    .then(foundUser => {
       if (!foundUser) {
         const error = new Error("No user with that username");
         error.statusCode = 401;
@@ -89,7 +93,7 @@ exports.post_LogIn = (req, res, next) => {
         return bcrypt.compare(req.body.password, foundUser.password);
       }
     })
-    .then((isEqual) => {
+    .then(isEqual => {
       if (!isEqual) {
         const error = new Error("Wrong password");
         error.statusCode = 401;
@@ -108,7 +112,7 @@ exports.post_LogIn = (req, res, next) => {
         .status(200)
         .json({ token: token, username: user.username, id: user._id });
     })
-    .catch((err) => {
+    .catch(err => {
       next(err);
     });
 };
